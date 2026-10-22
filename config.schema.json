@@ -1,0 +1,992 @@
+{
+    "pluginAlias": "ctrlPi",
+    "pluginType": "platform",
+    "singular": true,
+    "strictValidation": true,
+    "headerDisplay": "Controls Raspberry Pi, Pico W and ESP32 GPIO from HomeKit over the [ctrlPi](https://ctrlpi.com) REST API. Agent discovery is fully automatic over the LAN. Just list the devices attached to them.",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Name",
+                "type": "string",
+                "default": "ctrlPi"
+            },
+            "devices": {
+                "title": "Devices",
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Name",
+                            "type": "string",
+                            "description": "This name will appear in the Home App.",
+                            "pattern": "\\S",
+                            "validationMessage": "Enter a nonblank name."
+                        },
+                        "agent": {
+                            "title": "Hosting agent",
+                            "type": "string",
+                            "description": "Name of the agent this device is wired to.",
+                            "pattern": "\\S",
+                            "validationMessage": "Enter a nonblank agent."
+                        },
+                        "accessory": {
+                            "title": "Accessory type",
+                            "type": "string",
+                            "default": "switch",
+                            "oneOf": [
+                                {
+                                    "title": "─── Output Devices ───",
+                                    "enum": [
+                                        "_dummy_output"
+                                    ]
+                                },
+                                {
+                                    "title": "Switch",
+                                    "enum": [
+                                        "switch"
+                                    ]
+                                },
+                                {
+                                    "title": "Light",
+                                    "enum": [
+                                        "lightbulb"
+                                    ]
+                                },
+                                {
+                                    "title": "Fan",
+                                    "enum": [
+                                        "fan"
+                                    ]
+                                },
+                                {
+                                    "title": "Outlet",
+                                    "enum": [
+                                        "outlet"
+                                    ]
+                                },
+                                {
+                                    "title": "─── Input Devices ───",
+                                    "enum": [
+                                        "_dummy_input"
+                                    ]
+                                },
+                                {
+                                    "title": "Button (stateless switch)",
+                                    "enum": [
+                                        "button"
+                                    ]
+                                },
+                                {
+                                    "title": "Indicator (read-only light)",
+                                    "enum": [
+                                        "indicator"
+                                    ]
+                                },
+                                {
+                                    "title": "Contact sensor",
+                                    "enum": [
+                                        "contact"
+                                    ]
+                                },
+                                {
+                                    "title": "Motion sensor",
+                                    "enum": [
+                                        "motion"
+                                    ]
+                                },
+                                {
+                                    "title": "Occupancy sensor",
+                                    "enum": [
+                                        "occupancy"
+                                    ]
+                                },
+                                {
+                                    "title": "Smoke sensor",
+                                    "enum": [
+                                        "smoke"
+                                    ]
+                                },
+                                {
+                                    "title": "Carbon monoxide sensor",
+                                    "enum": [
+                                        "monoxide"
+                                    ]
+                                },
+                                {
+                                    "title": "Carbon dioxide sensor",
+                                    "enum": [
+                                        "dioxide"
+                                    ]
+                                },
+                                {
+                                    "title": "Leak sensor",
+                                    "enum": [
+                                        "leak"
+                                    ]
+                                },
+                                {
+                                    "title": "─── Combined Devices ───",
+                                    "enum": [
+                                        "_dummy_combined"
+                                    ]
+                                },
+                                {
+                                    "title": "Door Lock",
+                                    "enum": [
+                                        "lock"
+                                    ]
+                                },
+                                {
+                                    "title": "Garage door",
+                                    "enum": [
+                                        "garagedoor"
+                                    ]
+                                },
+                                {
+                                    "title": "Valve",
+                                    "enum": [
+                                        "valve"
+                                    ]
+                                },
+                                {
+                                    "title": "Irrigation System",
+                                    "enum": [
+                                        "irrigation"
+                                    ]
+                                },
+                                {
+                                    "title": "Window Shades",
+                                    "enum": [
+                                        "shades"
+                                    ]
+                                },
+                                {
+                                    "title": "─── Environment Sensors ───",
+                                    "enum": [
+                                        "_dummy_env"
+                                    ]
+                                },
+                                {
+                                    "title": "Temperature",
+                                    "enum": [
+                                        "temperature"
+                                    ]
+                                },
+                                {
+                                    "title": "Humidity",
+                                    "enum": [
+                                        "humidity"
+                                    ]
+                                },
+                                {
+                                    "title": "Light level",
+                                    "enum": [
+                                        "lux"
+                                    ]
+                                }
+                            ],
+                            "pattern": "^(switch|lightbulb|fan|outlet|button|indicator|garagedoor|valve|lock|contact|motion|occupancy|smoke|monoxide|dioxide|leak|temperature|humidity|lux|shades|irrigation|undefined|null|)$",
+                            "validationMessage": "Please select a real accessory type (do not select category headers)."
+                        },
+                        "gpio": {
+                            "title": "GPIO",
+                            "type": [
+                                "string",
+                                "integer"
+                            ],
+                            "description": "Required. BCM pin on a Pi, GP pin on a Pico, GPIO number on an ESP32.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; const acc = d.accessory; return acc !== 'irrigation' && acc !== 'temperature' && acc !== 'humidity' && acc !== 'lux';"
+                            },
+                            "pattern": "^[0-9]*$",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "maxLength": 15,
+                            "validationMessage": "Enter a nonnegative whole GPIO number, or leave an optional pin blank."
+                        },
+                        "reversed": {
+                            "title": "Reversed",
+                            "type": "boolean",
+                            "description": "Active-low wiring, as most relay boards use. Defaults to false.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory !== 'irrigation' && !['temperature','humidity','lux'].includes(d.accessory);"
+                            }
+                        },
+                        "pullup": {
+                            "title": "Pull resistor",
+                            "type": "string",
+                            "default": "up",
+                            "oneOf": [
+                                {
+                                    "title": "Pull up",
+                                    "enum": [
+                                        "up"
+                                    ]
+                                },
+                                {
+                                    "title": "Pull down",
+                                    "enum": [
+                                        "down"
+                                    ]
+                                },
+                                {
+                                    "title": "No pull resistor",
+                                    "enum": [
+                                        "none"
+                                    ]
+                                }
+                            ],
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return ['button','indicator','contact','motion','occupancy','smoke','monoxide','dioxide','leak','lock','garagedoor','valve','shades'].includes(d.accessory) || (d.accessory === 'outlet' && d.inUseGpio !== undefined && d.inUseGpio !== '');"
+                            },
+                            "description": "Agent-side pull resistor. Defaults to up if omitted. For combined devices, sets the pull resistor for all its sensors."
+                        },
+                        "pulse": {
+                            "title": "Pulse",
+                            "type": "boolean",
+                            "description": "Drive the pin, then let the agent revert it. Defaults to false. For shades, enable only for controllers where a second pulse on the same input stops movement.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory !== 'irrigation' && ['switch','lightbulb','fan','outlet','shades'].includes(d.accessory);"
+                            }
+                        },
+                        "duration": {
+                            "title": "Pulse duration (seconds)",
+                            "type": "number",
+                            "description": "Pulse length in seconds. Defaults to 2 seconds for outputs, garage doors, and shades; 3 for locks; 23 for latching valves.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; if (d.accessory === 'irrigation') return false; if (d.accessory === 'valve' && d.valveType !== 2) return false; return ['garagedoor', 'valve', 'lock'].includes(d.accessory) || d.pulse;"
+                            },
+                            "minimum": 0.001,
+                            "maximum": 2147478,
+                            "validationMessage": "Enter seconds from 0.001 to 2147478; decimals are allowed.",
+                            "placeholder": "2"
+                        },
+                        "tooLong": {
+                            "title": "Warn if on for (minutes)",
+                            "type": "integer",
+                            "description": "Log a warning when an output is left on this long. 0 disables.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return ['switch','lightbulb','fan','outlet'].includes(d.accessory);"
+                            },
+                            "minimum": 0,
+                            "maximum": 35791
+                        },
+                        "closeSensor": {
+                            "title": "Closed sensor GPIO",
+                            "type": [
+                                "string",
+                                "integer"
+                            ],
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'garagedoor' || d.accessory === 'shades';"
+                            },
+                            "pattern": "^[0-9]*$",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "maxLength": 15,
+                            "validationMessage": "Enter a nonnegative whole GPIO number, or leave an optional pin blank."
+                        },
+                        "closeSensorReversed": {
+                            "title": "Closed sensor reversed",
+                            "type": "boolean",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'garagedoor' || d.accessory === 'shades';"
+                            },
+                            "description": "Defaults to false."
+                        },
+                        "openSensor": {
+                            "title": "Open sensor GPIO",
+                            "type": [
+                                "string",
+                                "integer"
+                            ],
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'garagedoor' || d.accessory === 'shades';"
+                            },
+                            "pattern": "^[0-9]*$",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "maxLength": 15,
+                            "validationMessage": "Enter a nonnegative whole GPIO number, or leave an optional pin blank."
+                        },
+                        "openSensorReversed": {
+                            "title": "Open sensor reversed",
+                            "type": "boolean",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'garagedoor' || d.accessory === 'shades';"
+                            },
+                            "description": "Defaults to false."
+                        },
+                        "timeToOpen": {
+                            "title": "Time to open (seconds)",
+                            "type": "number",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'garagedoor' || d.accessory === 'shades';"
+                            },
+                            "minimum": 0.001,
+                            "maximum": 2147478,
+                            "validationMessage": "Enter seconds from 0.001 to 2147478; decimals are allowed.",
+                            "description": "Travel time in seconds. Defaults to 18 seconds if omitted.",
+                            "placeholder": "18"
+                        },
+                        "timeToClose": {
+                            "title": "Time to close (seconds)",
+                            "type": "number",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'garagedoor' || d.accessory === 'shades';"
+                            },
+                            "minimum": 0.001,
+                            "maximum": 2147478,
+                            "validationMessage": "Enter seconds from 0.001 to 2147478; decimals are allowed.",
+                            "description": "Travel time in seconds. Defaults to 18 seconds if omitted.",
+                            "placeholder": "18"
+                        },
+                        "valveType": {
+                            "title": "Wiring",
+                            "type": "integer",
+                            "oneOf": [
+                                {
+                                    "title": "Normally closed, single control",
+                                    "enum": [
+                                        0
+                                    ]
+                                },
+                                {
+                                    "title": "Normally open, single control",
+                                    "enum": [
+                                        1
+                                    ]
+                                },
+                                {
+                                    "title": "Latching / Pulsed, two controls",
+                                    "enum": [
+                                        2
+                                    ]
+                                }
+                            ],
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'valve';"
+                            },
+                            "description": "Wiring mode. Defaults to normally closed, single control."
+                        },
+                        "displayType": {
+                            "title": "Shown as",
+                            "type": "integer",
+                            "oneOf": [
+                                {
+                                    "title": "Generic valve",
+                                    "enum": [
+                                        0
+                                    ]
+                                },
+                                {
+                                    "title": "Irrigation",
+                                    "enum": [
+                                        1
+                                    ]
+                                },
+                                {
+                                    "title": "Shower head",
+                                    "enum": [
+                                        2
+                                    ]
+                                },
+                                {
+                                    "title": "Water faucet",
+                                    "enum": [
+                                        3
+                                    ]
+                                }
+                            ],
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'valve';"
+                            },
+                            "description": "HomeKit valve display. Defaults to generic valve."
+                        },
+                        "closeGpio": {
+                            "title": "Close relay GPIO",
+                            "type": [
+                                "string",
+                                "integer"
+                            ],
+                            "description": "Required, except for pulse shades. The second relay (latching valve, motorized lock, shades).",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return (d.accessory === 'valve' && d.valveType === 2) || (d.accessory === 'lock' && d.lockType === 2) || (d.accessory === 'shades' && d.pulse !== true);"
+                            },
+                            "pattern": "^[0-9]*$",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "maxLength": 15,
+                            "validationMessage": "Enter a nonnegative whole GPIO number, or leave an optional pin blank."
+                        },
+                        "valveDuration": {
+                            "title": "Run for (minutes)",
+                            "type": "integer",
+                            "description": "Automatic shutoff time in minutes. Defaults to 20 minutes; 0 disables.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'valve';"
+                            },
+                            "minimum": 0,
+                            "maximum": 60,
+                            "placeholder": "20"
+                        },
+                        "inUseGpio": {
+                            "title": "In-Use Sensor GPIO",
+                            "type": [
+                                "string",
+                                "integer"
+                            ],
+                            "description": "Input confirming the valve or outlet really is on.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return ['valve','outlet'].includes(d.accessory);"
+                            },
+                            "pattern": "^[0-9]*$",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "maxLength": 15,
+                            "validationMessage": "Enter a nonnegative whole GPIO number, or leave an optional pin blank."
+                        },
+                        "inUseReversed": {
+                            "title": "In-Use Sensor reversed",
+                            "type": "boolean",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return ['valve','outlet'].includes(d.accessory);"
+                            },
+                            "description": "Defaults to false."
+                        },
+                        "script": {
+                            "title": "Sensor script",
+                            "type": "string",
+                            "placeholder": "dht22.sh 4",
+                            "description": "Required for this device type. Script the agent runs for this reading: a bare filename in its scripts/ folder, plus letters/digits-only arguments. The plugin configures the sensor from this, so nothing needs setting up on the agent first. The sensor is named after this device.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return ['temperature','humidity','lux'].includes(d.accessory);"
+                            }
+                        },
+                        "field": {
+                            "title": "Field",
+                            "type": "string",
+                            "placeholder": "temp",
+                            "description": "Only if the script returns several fields: which one to read. Leave empty when it returns a single value.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return ['temperature','humidity','lux'].includes(d.accessory);"
+                            }
+                        },
+                        "interval": {
+                            "title": "Poll interval (seconds)",
+                            "type": "integer",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return ['temperature','humidity','lux'].includes(d.accessory);"
+                            },
+                            "description": "How often the agent runs the script, in seconds. Defaults to 900 seconds (15 minutes). 0 reads once at start only.",
+                            "minimum": 0,
+                            "maximum": 3600,
+                            "placeholder": "900"
+                        },
+                        "lockType": {
+                            "title": "Lock Wiring",
+                            "type": "integer",
+                            "oneOf": [
+                                {
+                                    "title": "Fail-Secure (Pulse to unlock)",
+                                    "enum": [
+                                        0
+                                    ]
+                                },
+                                {
+                                    "title": "Fail-Safe (Continuous power to lock)",
+                                    "enum": [
+                                        1
+                                    ]
+                                },
+                                {
+                                    "title": "Motorized / Latching (Two relays)",
+                                    "enum": [
+                                        2
+                                    ]
+                                }
+                            ],
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'lock';"
+                            },
+                            "description": "Wiring mode. Defaults to fail-secure."
+                        },
+                        "doorSensor": {
+                            "title": "Door Sensor GPIO",
+                            "type": [
+                                "string",
+                                "integer"
+                            ],
+                            "description": "Prevents locking if the door is physically open.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'lock';"
+                            },
+                            "pattern": "^[0-9]*$",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "maxLength": 15,
+                            "validationMessage": "Enter a nonnegative whole GPIO number, or leave an optional pin blank."
+                        },
+                        "doorSensorReversed": {
+                            "title": "Door Sensor reversed",
+                            "type": "boolean",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'lock';"
+                            },
+                            "description": "Defaults to false."
+                        },
+                        "lockedSensor": {
+                            "title": "Locked Sensor GPIO",
+                            "type": [
+                                "string",
+                                "integer"
+                            ],
+                            "description": "Hardware feedback confirming the deadbolt is actually thrown.",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'lock';"
+                            },
+                            "pattern": "^[0-9]*$",
+                            "minimum": 0,
+                            "maximum": 9007199254740991,
+                            "maxLength": 15,
+                            "validationMessage": "Enter a nonnegative whole GPIO number, or leave an optional pin blank."
+                        },
+                        "lockedSensorReversed": {
+                            "title": "Locked Sensor reversed",
+                            "type": "boolean",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'lock';"
+                            },
+                            "description": "Defaults to false."
+                        },
+                        "closeReversed": {
+                            "title": "Close relay reversed",
+                            "type": "boolean",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return (d.accessory === 'valve' && d.valveType === 2) || (d.accessory === 'lock' && d.lockType === 2) || (d.accessory === 'shades' && d.pulse !== true);"
+                            },
+                            "description": "Defaults to false."
+                        },
+                        "zones": {
+                            "title": "Irrigation Zones",
+                            "type": "array",
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'irrigation';"
+                            },
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "title": "Zone Name",
+                                        "type": "string",
+                                        "description": "Optional. A zone without a name is called GPIO followed by its pin. Leave the whole row empty to skip it."
+                                    },
+                                    "gpio": {
+                                        "title": "Zone GPIO",
+                                        "type": [
+                                            "string",
+                                            "integer"
+                                        ],
+                                        "minimum": 0,
+                                        "maximum": 9007199254740991,
+                                        "maxLength": 15,
+                                        "description": "Required for every zone you use.",
+                                        "pattern": "^[0-9]*$"
+                                    },
+                                    "reversed": {
+                                        "title": "Reversed",
+                                        "type": "boolean",
+                                        "description": "Active-low wiring. Defaults to false."
+                                    },
+                                    "duration": {
+                                        "title": "Default duration (minutes)",
+                                        "type": "integer",
+                                        "description": "Overrides default run time for this specific zone in minutes. Defaults to 20 minutes.",
+                                        "placeholder": "20",
+                                        "minimum": 1,
+                                        "maximum": 60
+                                    }
+                                },
+                                "if": {
+                                    "anyOf": [
+                                        {
+                                            "required": [
+                                                "name"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "pattern": "\\S"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "required": [
+                                                "gpio"
+                                            ],
+                                            "properties": {
+                                                "gpio": {
+                                                    "type": "integer"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "required": [
+                                                "gpio"
+                                            ],
+                                            "properties": {
+                                                "gpio": {
+                                                    "type": "string",
+                                                    "minLength": 1
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "then": {
+                                    "required": [
+                                        "gpio"
+                                    ],
+                                    "properties": {
+                                        "gpio": {
+                                            "pattern": "^[0-9]+$"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "agent",
+                        "accessory"
+                    ],
+                    "allOf": [
+                        {
+                            "if": {
+                                "properties": {
+                                    "accessory": {
+                                        "enum": [
+                                            "switch",
+                                            "lightbulb",
+                                            "fan",
+                                            "outlet",
+                                            "button",
+                                            "indicator",
+                                            "contact",
+                                            "motion",
+                                            "occupancy",
+                                            "smoke",
+                                            "monoxide",
+                                            "dioxide",
+                                            "leak",
+                                            "lock",
+                                            "garagedoor",
+                                            "valve",
+                                            "shades"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "accessory"
+                                ]
+                            },
+                            "then": {
+                                "required": [
+                                    "gpio"
+                                ],
+                                "properties": {
+                                    "gpio": {
+                                        "type": [
+                                            "string",
+                                            "integer"
+                                        ],
+                                        "pattern": "^[0-9]+$",
+                                        "minimum": 0,
+                                        "maximum": 9007199254740991,
+                                        "maxLength": 15
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "properties": {
+                                    "accessory": {
+                                        "enum": [
+                                            "temperature",
+                                            "humidity",
+                                            "lux"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "accessory"
+                                ]
+                            },
+                            "then": {
+                                "required": [
+                                    "script"
+                                ],
+                                "properties": {
+                                    "script": {
+                                        "type": "string",
+                                        "pattern": "\\S"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "if": {
+                                "anyOf": [
+                                    {
+                                        "properties": {
+                                            "accessory": {
+                                                "enum": [
+                                                    "shades"
+                                                ]
+                                            }
+                                        },
+                                        "required": [
+                                            "accessory"
+                                        ],
+                                        "not": {
+                                            "properties": {
+                                                "pulse": {
+                                                    "const": true
+                                                }
+                                            },
+                                            "required": [
+                                                "pulse"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "properties": {
+                                            "accessory": {
+                                                "const": "valve"
+                                            },
+                                            "valveType": {
+                                                "const": 2
+                                            }
+                                        },
+                                        "required": [
+                                            "accessory",
+                                            "valveType"
+                                        ]
+                                    },
+                                    {
+                                        "properties": {
+                                            "accessory": {
+                                                "const": "lock"
+                                            },
+                                            "lockType": {
+                                                "const": 2
+                                            }
+                                        },
+                                        "required": [
+                                            "accessory",
+                                            "lockType"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "then": {
+                                "required": [
+                                    "closeGpio"
+                                ],
+                                "properties": {
+                                    "closeGpio": {
+                                        "type": [
+                                            "string",
+                                            "integer"
+                                        ],
+                                        "pattern": "^[0-9]+$",
+                                        "minimum": 0,
+                                        "maximum": 9007199254740991,
+                                        "maxLength": 15
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "orderable": false
+            },
+            "rescan": {
+                "title": "Rescan Interval",
+                "description": "Background agent discovery rescan interval in minutes. Default 60. Set to 0 to disable.",
+                "type": "integer",
+                "default": 60,
+                "minimum": 0,
+                "maximum": 35791,
+                "placeholder": "60"
+            },
+            "agents": {
+                "title": "Agent Filter",
+                "description": "Optional whitelist or blacklist to restrict which shared agents this bridge can drive.",
+                "type": "object",
+                "properties": {
+                    "mode": {
+                        "title": "Agents filter",
+                        "type": "string",
+                        "default": "none",
+                        "oneOf": [
+                            {
+                                "title": "No filter (Allow all)",
+                                "enum": [
+                                    "none"
+                                ]
+                            },
+                            {
+                                "title": "Whitelist",
+                                "enum": [
+                                    "whitelist"
+                                ]
+                            },
+                            {
+                                "title": "Blacklist",
+                                "enum": [
+                                    "blacklist"
+                                ]
+                            }
+                        ]
+                    },
+                    "list": {
+                        "title": "Agents list",
+                        "type": "string",
+                        "description": "Comma-separated list of agents, e.g. agent1, agent2",
+                        "condition": {
+                            "functionBody": "return model.agents && model.agents.mode !== 'none';"
+                        }
+                    }
+                },
+                "required": [
+                    "mode"
+                ]
+            },
+            "sharedConfigPath": {
+                "title": "Shared Config Path",
+                "description": "Path to the shared agents-config.json to read agents from (read-only). Changes are saved to ctrlpi-agents-config.json in the Homebridge storage folder.",
+                "type": "string",
+                "default": "/home/pi/.ctrlpi/agents-config.json"
+            }
+        }
+    },
+    "layout": [
+        {
+            "key": "devices",
+            "type": "array",
+            "orderable": false,
+            "items": [
+                {
+                    "type": "section",
+                    "items": [
+                        "devices[].name",
+                        "devices[].agent",
+                        "devices[].accessory",
+                        {
+                            "key": "devices[].gpio",
+                            "type": "text"
+                        },
+                        "devices[].reversed",
+                        "devices[].pulse",
+                        "devices[].lockType",
+                        "devices[].valveType",
+                        "devices[].displayType",
+                        "devices[].duration",
+                        {
+                            "key": "devices[].closeGpio",
+                            "type": "text"
+                        },
+                        "devices[].closeReversed",
+                        {
+                            "key": "devices[].valveDuration",
+                            "type": "integer"
+                        },
+                        {
+                            "key": "devices[].closeSensor",
+                            "type": "text"
+                        },
+                        "devices[].closeSensorReversed",
+                        "devices[].script",
+                        "devices[].field",
+                        {
+                            "key": "devices[].interval",
+                            "type": "integer"
+                        },
+                        {
+                            "key": "devices[].zones",
+                            "type": "array",
+                            "orderable": false,
+                            "items": [
+                                "devices[].zones[].name",
+                                {
+                                    "key": "devices[].zones[].gpio",
+                                    "type": "text"
+                                },
+                                "devices[].zones[].reversed",
+                                {
+                                    "key": "devices[].zones[].duration",
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "fieldset",
+                            "title": "Advanced",
+                            "expandable": true,
+                            "expanded": false,
+                            "items": [
+                                "devices[].pullup",
+                                {
+                                    "key": "devices[].inUseGpio",
+                                    "type": "text"
+                                },
+                                "devices[].inUseReversed",
+                                {
+                                    "key": "devices[].doorSensor",
+                                    "type": "text"
+                                },
+                                "devices[].doorSensorReversed",
+                                {
+                                    "key": "devices[].lockedSensor",
+                                    "type": "text"
+                                },
+                                "devices[].lockedSensorReversed",
+                                {
+                                    "key": "devices[].openSensor",
+                                    "type": "text"
+                                },
+                                "devices[].openSensorReversed",
+                                "devices[].timeToOpen",
+                                "devices[].timeToClose"
+                            ],
+                            "condition": {
+                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; const acc = d.accessory; return ['button','indicator','contact','motion','occupancy','smoke','monoxide','dioxide','leak','outlet','valve','lock','garagedoor','shades'].includes(acc);"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "fieldset",
+            "title": "Plugin setup",
+            "expandable": true,
+            "expanded": false,
+            "items": [
+                "agents.mode",
+                "agents.list",
+                {
+                    "key": "rescan",
+                    "type": "integer"
+                },
+                "sharedConfigPath"
+            ]
+        }
+    ]
+}

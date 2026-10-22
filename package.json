@@ -1,0 +1,66 @@
+{
+  "name": "homebridge-ctrlpi",
+  "displayName": "ctrlPi Bridge",
+  "type": "module",
+  "version": "0.9.78",
+  "description": "Control Raspberry Pi, Pico W and ESP32 GPIO from HomeKit over the ctrlPi REST API - switches, lights, fans, outlets, valves, garage doors, locks, shades, irrigation, sensors.",
+  "author": "ctrlPi",
+  "license": "MIT",
+  "homepage": "https://ctrlpi.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ctrlpi/homebridge-ctrlpi.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ctrlpi/homebridge-ctrlpi/issues"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "ctrlpi",
+    "gpio",
+    "raspberry-pi",
+    "raspberry",
+    "pi",
+    "rpi",
+    "pico",
+    "esp32",
+    "esp32-c3",
+    "esp32-s3",
+    "switch",
+    "outlet",
+    "fan",
+    "light",
+    "lightbulb",
+    "valve",
+    "garage-door",
+    "garage",
+    "door",
+    "sensor",
+    "contact",
+    "motion",
+    "occupancy",
+    "smoke",
+    "leak",
+    "temperature",
+    "humidity"
+  ],
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20.0.0",
+    "homebridge": "^1.8.0 || ^2.0.0"
+  },
+  "scripts": {
+    "build": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\" && tsc",
+    "lint": "eslint . --max-warnings=0",
+    "prepublishOnly": "npm run lint && npm run build",
+    "test": "npm run build && node test/tests.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.6.0",
+    "eslint": "^10.3.0",
+    "homebridge": "^2.0.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2"
+  }
+}
