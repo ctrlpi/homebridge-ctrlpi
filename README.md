@@ -1,7 +1,7 @@
 # Homebridge ctrlPi Plugin
 
 [![Platform: Homebridge](https://img.shields.io/badge/platform-Homebridge%201.8%20%7C%202.0%2B-006400.svg)](#install)
-[![Version 0.9.78](https://img.shields.io/badge/version-0.9.78-blue.svg)](https://github.com/ctrlpi/homebridge-ctrlpi/tags)
+[![Version 0.9.80](https://img.shields.io/badge/version-0.9.80-blue.svg)](https://github.com/ctrlpi/homebridge-ctrlpi/tags)
 [![Auth: Api-Key](https://img.shields.io/badge/auth-Api--Key-orange.svg)](#authentication)
 [![Agents: Pi, Pico & ESP32](https://img.shields.io/badge/agents-Pi%2C%20Pico%20%26%20ESP32-006400.svg)](#install)
 [![License: MIT](https://img.shields.io/badge/license-MIT-188038.svg)](LICENSE)
@@ -37,7 +37,7 @@ This plugin holds **no GPIO logic of its own**. Homebridge does not have to run 
 
 ### Option 1: Homebridge UI (recommended)
 
-Open **Plugins**, search for **ctrlPi**, and install it. Everything below is editable in the plugin's settings screen, so the JSON is only ever there if you prefer to write it.
+Open **Plugins**, search for **homebridge-ctrlpi**, and install it. Everything below is editable in the plugin's settings screen, so the JSON is only ever there if you prefer to write it.
 
 ### Option 2: terminal
 

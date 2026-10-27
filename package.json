@@ -2,7 +2,7 @@
   "name": "homebridge-ctrlpi",
   "displayName": "ctrlPi Bridge",
   "type": "module",
-  "version": "0.9.78",
+  "version": "0.9.80",
   "description": "Control Raspberry Pi, Pico W and ESP32 GPIO from HomeKit over the ctrlPi REST API - switches, lights, fans, outlets, valves, garage doors, locks, shades, irrigation, sensors.",
   "author": "ctrlPi",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "raspberry-pi",
     "raspberry",
     "pi",
-    "rpi",
+    "raspberry-pi-pico",
     "pico",
     "esp32",
     "esp32-c3",
@@ -42,7 +42,11 @@
     "smoke",
     "leak",
     "temperature",
-    "humidity"
+    "humidity",
+    "raspberry pi",
+    "raspberry pico",
+    "pico-pi",
+    "iot"
   ],
   "main": "dist/index.js",
   "engines": {

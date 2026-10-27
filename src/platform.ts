@@ -126,7 +126,7 @@ export class CtrlPiPlatform implements DynamicPlatformPlugin {
     this.devices = validateConfiguration(config, log);
     this.Service = api.hap.Service;
     this.Characteristic = api.hap.Characteristic;
-    this.version = '0.9.78';
+    this.version = '0.9.80';
     // Not in config.schema.json on purpose: the defaults are right for everyone, and
     // anyone who really needs to move them can still set them in the JSON by hand.
     this.webhookPort = (this.config.webhookPort as number) ?? DEFAULT_WEBHOOK_PORT;
