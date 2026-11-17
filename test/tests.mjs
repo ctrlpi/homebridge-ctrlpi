@@ -46,7 +46,7 @@ console.log('\n--- startup: agent configured over REST');
 const g = state.config.gpios;
 ok('bridges.homebridge callback pushed', /^http:\/\/.+\/webhook\?agent=mockpi$/.test(state.config.bridges.homebridge || ''), state.config.bridges.homebridge);
 ok('bridges.homebridge_key is a 12-char key', (state.config.bridges.homebridge_key || '').length === 12);
-// The homekit pair belongs to the standalone homekit-bridge: this plugin must leave it alone,
+// The homekit pair belongs to a standalone HomeKit bridge: this plugin must leave it alone,
 // or the two cannot drive the same agent at once, which is the whole reason for the split.
 ok('bridges.homekit left untouched', !state.config.bridges.homekit && !state.config.bridges.homekit_key,
   JSON.stringify({ homekit: state.config.bridges.homekit, homekit_key: state.config.bridges.homekit_key }));

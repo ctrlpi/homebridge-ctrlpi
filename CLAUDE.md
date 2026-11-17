@@ -13,7 +13,7 @@ Home through an existing Homebridge install. It holds **no GPIO logic**: every r
 HTTP call to a `pi-gpio-api` Pi, a `pico-gpio-api` Pico W or an `esp32-gpio-api` ESP32 over its REST
 API, and pin changes arrive as webhook callbacks rather than by polling.
 
-It is the plugin-shaped sibling of `homekit-bridge`. Same agents, same callback protocol, same device
+It is the plugin-shaped sibling of a standalone HomeKit bridge. Same agents, same callback protocol, same device
 vocabulary, but it runs inside someone else's Homebridge rather than as its own hap-nodejs process.
 Devices are configured in **Homebridge's own `config.json`** (the settings form); agents come from
 the agent lists below, not from that config.
@@ -45,11 +45,11 @@ root `CLAUDE.md` only.
 ## It has its own callback slot: `bridges.homebridge` on 8318
 
 This plugin claims an agent's `bridges.homebridge` + `bridges.homebridge_key` fields. Those are its
-own, **not** the `bridges.homekit` pair the standalone `homekit-bridge` uses. Both projects put pins
+own, **not** the `bridges.homekit` pair a standalone HomeKit bridge uses. Both projects put pins
 in the Home app, so a household may well run one of each, and while they shared a single slot
 whichever configured itself last silently stopped the other receiving events. With a slot each they
-drive the **same** agent at once, on separate ports: 8315 mcp-bridge, 8316 homekit-bridge, 8317
-matter-bridge, 8318 this plugin. That needs an agent on **0.9.21 or newer**, which is where the
+drive the **same** agent at once, on separate ports: 8315 ctrlpi-mcp, 8316 the standalone HomeKit bridge, 8317
+ctrlpi-matter, 8318 this plugin. That needs an agent on **0.9.21 or newer**, which is where the
 `homebridge` fields were added; older agents do not have them and no events arrive.
 `DEFAULT_WEBHOOK_PORT` in `src/settings.ts` says the same thing.
 
@@ -209,8 +209,8 @@ is a third copy. Change all of them together.
 
 ## Related projects
 
-`pi-gpio-api` / `pico-gpio-api` / `esp32-gpio-api` are the agents this drives. `homekit-bridge` is
-the standalone equivalent, `matter-bridge` the Matter one. See the monorepo root `CLAUDE.md` for how
+`pi-gpio-api` / `pico-gpio-api` / `esp32-gpio-api` are the agents this drives. A standalone HomeKit bridge
+is the equivalent outside Homebridge, `ctrlpi-matter` the Matter one. See the monorepo root `CLAUDE.md` for how
 they fit together.
 
 ## An agent's address is optional

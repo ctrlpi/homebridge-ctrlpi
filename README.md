@@ -1,7 +1,7 @@
-# Homebridge ctrlPi Plugin
+# Homebridge ctrlPi
 
 [![Platform: Homebridge](https://img.shields.io/badge/platform-Homebridge%201.8%20%7C%202.0%2B-006400.svg)](#install)
-[![Version 0.9.80](https://img.shields.io/badge/version-0.9.80-blue.svg)](https://github.com/ctrlpi/homebridge-ctrlpi/tags)
+[![Version 0.9.81](https://img.shields.io/badge/version-0.9.81-blue.svg)](https://github.com/ctrlpi/homebridge-ctrlpi/tags)
 [![Auth: Api-Key](https://img.shields.io/badge/auth-Api--Key-orange.svg)](#authentication)
 [![Agents: Pi, Pico & ESP32](https://img.shields.io/badge/agents-Pi%2C%20Pico%20%26%20ESP32-006400.svg)](#install)
 [![License: MIT](https://img.shields.io/badge/license-MIT-188038.svg)](LICENSE)
@@ -37,7 +37,7 @@ This plugin holds **no GPIO logic of its own**. Homebridge does not have to run 
 
 ### Option 1: Homebridge UI (recommended)
 
-Open **Plugins**, search for **homebridge-ctrlpi**, and install it. Everything below is editable in the plugin's settings screen, so the JSON is only ever there if you prefer to write it.
+Open **Plugins**, search for **ctrlpi**, and install it. Everything below is editable in the plugin's settings screen, so the JSON is only ever there if you prefer to write it.
 
 ### Option 2: terminal
 
@@ -49,7 +49,7 @@ Restart Homebridge afterwards, either way.
 
 ## Quick Start
 
-1. In the Homebridge UI, open **Plugins**, find **ctrlPi** and click **Settings**.
+1. In the Homebridge UI, open **Plugins**, find **Homebridge ctrlPi** and click **Settings**.
 2. Under **Devices**, click **Add** for each thing wired to an agent. Pick the **Agent** it lives on, give the device a **Name**, choose its **Accessory** type and enter the **GPIO** pin. The form shows only the fields that type needs, such as sensors for a garage door or a script for a temperature sensor.
 3. Click **Save** and restart Homebridge.
 
@@ -297,12 +297,12 @@ npm run lint
 - **[`pi-gpio-api`](https://github.com/ctrlpi/pi-gpio-api)**: Raspberry Pi GPIO REST server that reads inputs and drives outputs (and named sensors) over an HTTP API.
 - **[`pico-gpio-api`](https://github.com/ctrlpi/pico-gpio-api)**: Raspberry Pi Pico W port of the GPIO REST server, with the same endpoints, wire format, and auth.
 - **[`esp32-gpio-api`](https://github.com/ctrlpi/esp32-gpio-api)**: ESP32 port of the GPIO REST server for MicroPython, with the same endpoints, wire format, and auth.
-- **[`mcp-bridge`](https://github.com/ctrlpi/mcp-bridge)**: MCP server that exposes GPIO control as tools for AI agents (e.g. Claude), executing them over the agents' REST API.
-- **`matter-bridge`** *(coming soon)*: Matter bridge that exposes GPIO pins and sensors to any Matter platform (Apple Home, Google Home, Alexa, Home Assistant), driven over the agents' REST API.
+- **[`ctrlpi-mcp`](https://github.com/ctrlpi/ctrlpi-mcp)**: MCP server that exposes GPIO control as tools for AI agents (e.g. Claude), executing them over the agents' REST API.
+- **`ctrlpi-matter`** *(coming soon)*: Matter bridge that exposes GPIO pins and sensors to any Matter platform (Apple Home, Google Home, Alexa, Home Assistant), driven over the agents' REST API.
 - **[`ctrlpi-cli`](https://github.com/ctrlpi/ctrlpi-cli)**: Command-line interface for interacting with ctrlPi agents, with shared agent configuration.
 - **[`ctrlpi-lab`](https://github.com/ctrlpi/ctrlpi-lab)**: A local browser dashboard for your ctrlPi setup. Test GPIO and sensor endpoints, watch webhook events, and tail agent logs.
 - **[`pico-bay`](https://github.com/ctrlpi/pico-bay)**: Web app and MCP server for managing MicroPython and CircuitPython boards, such as the Raspberry Pi Pico and ESP32, over USB.
-- **`pi-bay`** *(coming soon)*: A local web app and MCP server for Raspberry Pi boards over the network. Edit files, open a remote terminal, and manage your Pi remotely.
+- **[`pi-bay`](https://github.com/ctrlpi/pi-bay)**: A local web app and MCP server for Raspberry Pi boards over the network. Edit files, open a remote terminal, and manage your Pi remotely.
 
 ## License
 
