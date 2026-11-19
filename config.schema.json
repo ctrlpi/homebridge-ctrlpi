@@ -255,14 +255,13 @@
                         "duration": {
                             "title": "Pulse duration (seconds)",
                             "type": "number",
-                            "description": "Pulse length in seconds. Defaults to 2 seconds for outputs, garage doors, and shades; 3 for locks; 23 for latching valves.",
+                            "description": "Pulse length in seconds. Leave blank for the default: 23 seconds for a latching valve, 3 for a lock, 2 for outputs, garage doors and shades.",
                             "condition": {
                                 "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; if (d.accessory === 'irrigation') return false; if (d.accessory === 'valve' && d.valveType !== 2) return false; return ['garagedoor', 'valve', 'lock'].includes(d.accessory) || d.pulse;"
                             },
                             "minimum": 0.001,
                             "maximum": 2147478,
-                            "validationMessage": "Enter seconds from 0.001 to 2147478; decimals are allowed.",
-                            "placeholder": "2"
+                            "validationMessage": "Enter seconds from 0.001 to 2147478; decimals are allowed."
                         },
                         "tooLong": {
                             "title": "Warn if on for (minutes)",
@@ -425,13 +424,13 @@
                         "valveDuration": {
                             "title": "Run for (minutes)",
                             "type": "integer",
-                            "description": "Automatic shutoff time in minutes. Defaults to 20 minutes; 0 disables.",
+                            "description": "Automatic shutoff time in minutes. 0 (the default) means the valve stays open until you close it.",
                             "condition": {
                                 "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return d.accessory === 'valve';"
                             },
                             "minimum": 0,
                             "maximum": 60,
-                            "placeholder": "20"
+                            "placeholder": "0"
                         },
                         "inUseGpio": {
                             "title": "In-Use Sensor GPIO",

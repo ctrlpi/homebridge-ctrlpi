@@ -37,17 +37,25 @@ export class ValveAccessory extends CtrlPiAccessory {
     service.updateCharacteristic(C.ValveType, this.device.displayType ?? 0);
 
     // Config provides valveDuration in minutes. Convert to seconds for internal/HomeKit use.
-    if (this.device.valveDuration !== undefined) {
-      this.device.valveDuration = this.device.valveDuration * 60;
+    // 0 (the default) means no automatic shutoff, so the timer characteristics (SetDuration,
+    // RemainingDuration) are left off and Home shows a plain on/off valve with no timer picker.
+    const minutes = this.device.valveDuration ?? 0;
+    this.device.valveDuration = minutes * 60;
+    if (minutes > 0) {
+      service.getCharacteristic(C.SetDuration)
+        .onGet(() => this.device.valveDuration ?? 0)
+        .onSet((v) => {
+          this.device.valveDuration = v as number;
+        });
+      service.getCharacteristic(C.RemainingDuration).onGet(() => this.remaining());
     } else {
-      this.device.valveDuration = 1200; // 20 mins default in seconds
+      // A cached accessory may still carry them from an earlier configuration.
+      for (const c of [C.SetDuration, C.RemainingDuration]) {
+        if (service.testCharacteristic(c)) {
+          service.removeCharacteristic(service.getCharacteristic(c));
+        }
+      }
     }
-    service.getCharacteristic(C.SetDuration)
-      .onGet(() => this.device.valveDuration ?? 1200)
-      .onSet((v) => {
-        this.device.valveDuration = v as number;
-      });
-    service.getCharacteristic(C.RemainingDuration).onGet(() => this.remaining());
     return service;
   }
 

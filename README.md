@@ -1,7 +1,7 @@
 # Homebridge ctrlPi
 
 [![Platform: Homebridge](https://img.shields.io/badge/platform-Homebridge%201.8%20%7C%202.0%2B-006400.svg)](#install)
-[![Version 0.9.81](https://img.shields.io/badge/version-0.9.81-blue.svg)](https://github.com/ctrlpi/homebridge-ctrlpi/tags)
+[![Version 0.9.82](https://img.shields.io/badge/version-0.9.82-blue.svg)](https://github.com/ctrlpi/homebridge-ctrlpi/tags)
 [![Auth: Api-Key](https://img.shields.io/badge/auth-Api--Key-orange.svg)](#authentication)
 [![Agents: Pi, Pico & ESP32](https://img.shields.io/badge/agents-Pi%2C%20Pico%20%26%20ESP32-006400.svg)](#install)
 [![License: MIT](https://img.shields.io/badge/license-MIT-188038.svg)](LICENSE)
@@ -121,7 +121,7 @@ An agent is known by its `name` (what it answers on `GET /hello`). Agents are fo
 | `closeReversed` | latching `valve`, motorized `lock`, `shades` | Invert the second relay (defaults to `reversed`). |
 | `inUseGpio` / `inUseReversed` | `valve`, `outlet` | Input confirming it really is on, and whether to invert it. |
 | `valveType` | `valve` | Wiring, see [Valves](#valves). |
-| `valveDuration` | `valve` | Default run time in minutes (default `20`, `0` disables automatic closing). |
+| `valveDuration` | `valve` | Run time in minutes before the valve closes itself (default `0`, no automatic closing). |
 | `displayType` | `valve` | How Home shows it: `0` generic, `1` irrigation, `2` shower head, `3` water faucet. |
 | `lockType` | `lock` | Wiring, see [Locks](#locks). |
 | `doorSensor` / `doorSensorReversed` | `lock` | Input reporting the door shut. Locking is refused while it reads open. |
@@ -178,7 +178,7 @@ Three valve types are supported, chosen with `valveType`:
 
 A latching valve holds position with no power, so the relay state afterwards says nothing about where the valve is. Add `inUseGpio` for real feedback.
 
-`valveDuration` sets the run time Home starts with, and the valve closes itself when it runs out. Home can change the run time per valve.
+`valveDuration` sets the run time Home starts with, and the valve closes itself when it runs out. The default is `0`: the valve has no timer in Home and stays open until you close it. Set it above `0` to get a timer, and Home can then change the run time per valve.
 
 ### Locks
 

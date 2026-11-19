@@ -540,6 +540,31 @@ console.log('\n--- restart: unchanged pins are not reconfigured');
   srv.close();
 }
 
+// A valve never closes by itself and shows no timer in Home unless valveDuration says so.
+console.log('\n--- valve: default run time');
+{
+  const a = makeApi();
+  const plat = new CtrlPiPlatform(makeLog(), {
+    platform: 'ctrlPi', sharedConfigPath: NO_SHARED, webhookPort: 9690,
+    agents: [{ name: 'mockpi', ip: '127.0.0.1', port: 9691, api_key: 'test-key' }],
+    devices: [
+      { agent: 'mockpi', name: 'Plain', accessory: 'valve', gpio: 1 },
+      { agent: 'mockpi', name: 'Latch', accessory: 'valve', gpio: 2, valveType: 2, closeGpio: 3 },
+      { agent: 'mockpi', name: 'LatchTimed', accessory: 'valve', gpio: 4, valveType: 2, closeGpio: 5, valveDuration: 10 },
+    ],
+  }, a);
+  a.emit('didFinishLaunching');
+  await sleep(200);
+  const svc = name => plat.handlers.find(h => h.device.name === name).service;
+  ok('plain valve has no timer (no SetDuration, no RemainingDuration)',
+    !svc('Plain').testCharacteristic('SetDuration') && !svc('Plain').testCharacteristic('RemainingDuration'));
+  ok('latching valve has no timer', !svc('Latch').testCharacteristic('SetDuration'));
+  ok('a valve with valveDuration keeps the timer and its run time',
+    await svc('LatchTimed').getCharacteristic('SetDuration').handlers.get() === 600
+    && svc('LatchTimed').testCharacteristic('RemainingDuration'));
+  plat.listener?.close();
+}
+
 // An agent that is offline when Homebridge starts must still get set up once it is back,
 // by the retry timer or by its first (stale-key) event, without a restart.
 console.log('\n--- agent offline at startup');

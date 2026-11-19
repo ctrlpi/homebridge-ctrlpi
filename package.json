@@ -2,11 +2,11 @@
   "name": "homebridge-ctrlpi",
   "displayName": "Homebridge ctrlPi (control Pi, Pico & ESP32)",
   "type": "module",
-  "version": "0.9.81",
+  "version": "0.9.82",
   "description": "Control Raspberry Pi, Pico W and ESP32 GPIO from HomeKit over the ctrlPi REST API - switches, lights, fans, outlets, valves, garage doors, locks, shades, irrigation, sensors.",
   "author": "ctrlPi",
   "license": "MIT",
-  "homepage": "https://ctrlpi.com",
+  "homepage": "https://ctrlpi.com/homebridge-ctrlpi",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ctrlpi/homebridge-ctrlpi.git"

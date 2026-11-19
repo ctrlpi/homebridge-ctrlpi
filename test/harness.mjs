@@ -43,6 +43,12 @@ class Svc {
     }
     return this.chars.get(key);
   }
+  testCharacteristic(c) {
+    return this.chars.has(typeof c === 'string' ? c : c.__name);
+  }
+  removeCharacteristic(ch) {
+    this.chars.delete(ch.name); return this;
+  }
   setCharacteristic(c, v) {
     this.getCharacteristic(c).updateValue(v); return this;
   }
