@@ -56,7 +56,7 @@ export class ShadesAccessory extends CtrlPiAccessory {
     const upMax = this.device.pulse === false ? (this.device.timeToOpen ?? 18) : (this.device.duration ?? 2);
     const downMax = this.device.pulse === false ? (this.device.timeToClose ?? 18) : (this.device.duration ?? 2);
 
-    await this.agent.configurePin(this.device.gpio, {
+    await this.configureOwnPin({
       name: `${this.device.name} up`,
       type: 'output',
       reversed: this.device.reversed ?? false,

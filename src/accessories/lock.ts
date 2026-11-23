@@ -68,7 +68,7 @@ export class LockAccessory extends CtrlPiAccessory {
     }
 
     if (this.device.gpio !== undefined) {
-      await this.agent.configurePin(this.device.gpio, {
+      await this.configureOwnPin({
         name: this.wiring === 2 ? `${this.device.name} unlock` : this.device.name,
         type: 'output',
         reversed: this.device.reversed ?? false,

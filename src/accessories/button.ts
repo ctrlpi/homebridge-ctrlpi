@@ -39,7 +39,7 @@ export class ButtonAccessory extends CtrlPiAccessory {
     if (this.device.gpio === undefined) {
       throw new Error(`Button '${this.device.name}' has no gpio.`);
     }
-    await this.agent.configurePin(this.device.gpio, {
+    await this.configureOwnPin({
       name: this.device.name,
       type: 'input',
       pullup: this.device.pullup ?? 'up',

@@ -457,13 +457,10 @@
                             "description": "Defaults to false."
                         },
                         "script": {
-                            "title": "Sensor script",
+                            "title": "Script",
                             "type": "string",
-                            "placeholder": "dht22.sh 4",
-                            "description": "Required for this device type. Script the agent runs for this reading: a bare filename in its scripts/ folder, plus letters/digits-only arguments. The plugin configures the sensor from this, so nothing needs setting up on the agent first. The sensor is named after this device.",
-                            "condition": {
-                                "functionBody": "const d = (model.devices && model.devices[arrayIndices[0]]) || {}; return ['temperature','humidity','lux'].includes(d.accessory);"
-                            }
+                            "placeholder": "dht22.sh 4, or on: relay.sh",
+                            "description": "A script in the agent's scripts folder, for Sensors it is the script that produces the reading, for other devices (optional) the script to run when the state changes. Use on: or off: to run only when the state goes on or off, with no prefix it runs on both and gets 1 or 0 as its last argument."
                         },
                         "field": {
                             "title": "Field",

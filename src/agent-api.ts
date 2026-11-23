@@ -23,6 +23,7 @@ function pinMatches(stored: Record<string, unknown> | undefined, want: Record<st
     case 'watched': return (have === true) === (value === true);
     case 'reversed': return (have === true) === (value === true);
     case 'max': return Number(have || 0) === Number(value || 0);
+    case 'script': return (have || '') === (value || '');
     case 'pullup': return want.type !== 'input' || (have ?? 'up') === value;
     default: return have === value;
     }
@@ -204,6 +205,13 @@ export class Agent {
     if (!this.storedPins) {
       const config = await this.readConfig();
       this.storedPins = (config.gpios ?? {}) as Record<string, Record<string, unknown>>;
+    }
+    // `script: null` says "this pin's device has no pin script": clear one the agent still has, else
+    // send nothing, so an agent older than pin scripts never receives the field.
+    if (cfg.script === null) {
+      const rest = { ...cfg };
+      delete rest.script;
+      cfg = this.storedPins[String(gpio)]?.script ? { ...rest, script: '' } : rest;
     }
     if (pinMatches(this.storedPins[String(gpio)], cfg)) {
       return this.storedPins[String(gpio)];

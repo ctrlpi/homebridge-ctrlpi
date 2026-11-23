@@ -18,6 +18,7 @@ import type { CtrlPiAccessory } from './accessories/base.js';
 import { buildAccessory } from './accessories/factory.js';
 import { DEFAULT_AGENT_PORT, DEFAULT_WEBHOOK_PORT, PLATFORM_NAME, PLUGIN_NAME } from './settings.js';
 import type { AgentConfig, DeviceConfig, WebhookEvent } from './types.js';
+import { RED, paint } from './logging.js';
 
 /** How often an agent that could not be set up (offline at startup, say) is tried again. */
 const SETUP_RETRY_INTERVAL = 2 * 60_000;
@@ -126,7 +127,7 @@ export class CtrlPiPlatform implements DynamicPlatformPlugin {
     this.devices = validateConfiguration(config, log);
     this.Service = api.hap.Service;
     this.Characteristic = api.hap.Characteristic;
-    this.version = '0.9.82';
+    this.version = '0.9.83';
     // Not in config.schema.json on purpose: the defaults are right for everyone, and
     // anyone who really needs to move them can still set them in the JSON by hand.
     this.webhookPort = (this.config.webhookPort as number) ?? DEFAULT_WEBHOOK_PORT;
@@ -414,7 +415,8 @@ export class CtrlPiPlatform implements DynamicPlatformPlugin {
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
           if (e instanceof AgentError) {
-            this.log.error(`Could not configure '${handler.name}' on agent '${handler.agentName}': ${msg}`);
+            const shown = /script/i.test(msg) ? paint(RED, msg) : msg; // a missing script shows in red
+            this.log.error(`Could not configure '${handler.name}' on agent '${handler.agentName}': ${shown}`);
           } else {
             this.log.error(`Could not configure '${handler.name}':`, e);
           }

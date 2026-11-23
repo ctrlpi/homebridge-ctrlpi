@@ -32,7 +32,7 @@ const platform = new CtrlPiPlatform(log, {
   devices: [
     { agent: 'mockpi', name: 'Garage', accessory: 'garagedoor', gpio: 26, duration: 2, pulse: false,
       closeSensor: 13, openSensor: 19, timeToOpen: 0.3, timeToClose: 0.3 },
-    { agent: 'mockpi', name: 'Porch', accessory: 'lightbulb', gpio: 6, reversed: true },
+    { agent: 'mockpi', name: 'Porch', accessory: 'lightbulb', gpio: 6, reversed: true, script: 'On:  relay.sh   fast' },
     { agent: 'mockpi', name: 'Door', accessory: 'contact', gpio: 15 },
     { agent: 'mockpi', name: 'Pilot', accessory: 'indicator', gpio: 20 },
     { agent: 'mockpi', name: 'Bell', accessory: 'button', gpio: 21 },
@@ -63,6 +63,9 @@ const atticValue = () => attic.service.getCharacteristic('CurrentTemperature').v
 ok('sensor field picked from reading', atticValue() === 21.5, String(atticValue()));
 ok('light -> reversed watched output', g['6']?.type === 'output' && g['6']?.reversed === true && g['6']?.watched === true);
 ok('contact -> pullup up', g['15']?.pullup === 'up', JSON.stringify(g['15']));
+// A device's script goes to the agent in its own form with the device's GPIO; a device without one sends none.
+ok('light -> pin script pushed canonical', g['6']?.script === 'on:relay.sh fast', JSON.stringify(g['6']));
+ok('contact -> no pin script sent', !('script' in (g['15'] || {})), JSON.stringify(g['15']));
 
 const handlers = platform.handlers;
 const garage = handlers.find(h => h.device.name === 'Garage');

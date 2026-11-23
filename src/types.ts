@@ -38,7 +38,12 @@ export interface DeviceConfig {
   /** GPIO number driving this device. Absent for sensor-backed types. */
   gpio?: number;
   /**
-   * The script the agent should run for this sensor: "<file> [args...]", a bare
+   * Devices with a `gpio`: a pin script the agent runs when the pin's value changes,
+   * "[on:|off:]<file> [args...]" (`on:` only for 1, `off:` only for 0 with no value passed, no prefix
+   * both ways with 1 or 0 as the last argument). Pushed with the device's own `gpio`; a device
+   * without one clears a script the agent still has on that pin. Agent 0.9.50 or later.
+   *
+   * Measured sensors: the script the agent should run for this sensor: "<file> [args...]", a bare
    * filename in the agent's scripts/ folder. The plugin configures the sensor from
    * this, so nothing has to exist on the agent first. The sensor is named after the
    * device, so there is no separate name to keep in step.

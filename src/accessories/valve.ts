@@ -82,7 +82,7 @@ export class ValveAccessory extends CtrlPiAccessory {
       throw new Error(`Valve '${this.device.name}' has no gpio.`);
     }
     const pulseMs = ((this.device.duration ?? 23) * 1000);
-    await this.agent.configurePin(this.device.gpio, {
+    await this.configureOwnPin({
       name: this.wiring === 2 ? `${this.device.name} open` : this.device.name,
       type: 'output',
       reversed: this.device.reversed ?? false,

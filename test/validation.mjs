@@ -7,6 +7,7 @@ import { makeApi, makeLog } from './harness.mjs';
 const device = overrides => ({ name: 'Test', agent: 'pi', accessory: 'switch', gpio: 0, ...overrides });
 const GOOD = device({ name: 'Good', gpio: 5 });
 let checks = 0;
+import { pinScriptError, canonicalPinScript } from '../dist/validation.js';
 
 /** Runs the device next to a good one: the good one must always survive. */
 function run(bad) {
@@ -203,3 +204,24 @@ const plat = new CtrlPiPlatform(makeLog(), {
 assert.deepEqual(plat.devices.map(d => d.name), ['Good'], 'bad device skipped, good one kept');
 assert.equal(api.listenerCount('didFinishLaunching'), 1, 'discovery still starts');
 console.log(`${checks} validation cases passed, including per-device skipping and normalization.`);
+
+// A pin script ([on:|off:]<file> [args]) on a device with a GPIO: stored the way the agents store it,
+// refused when it is not a plain filename, ignored by a device with no pin of its own.
+assert.equal(valid(device({ gpio: 5, script: 'On:   relay.sh   fast ' }), 'pin script')[0].script, 'on:relay.sh fast');
+assert.equal(canonicalPinScript('OFF: relay.sh'), 'off:relay.sh');
+assert.equal(canonicalPinScript('  '), '');
+for (const bad of ['../x.sh', 'sub/x.sh', '.hidden', 'relay.sh a-b', 'on:', 'off: ', 'a'.repeat(33)]) {
+  assert.ok(pinScriptError(bad), bad);
+  invalid(device({ gpio: 5, script: bad }), `pin script ${bad}`);
+}
+assert.ok(!('script' in valid(device({ gpio: 5, script: '  ' }), 'empty pin script')[0]), 'an empty script means none');
+assert.ok(
+  !('script' in valid({ name: 'Lawn', agent: 'pi', accessory: 'irrigation', script: 'relay.sh', zones: [{ gpio: 4 }] }, 'irrigation')[0]),
+  'a device with no gpio ignores script',
+);
+assert.equal(
+  valid(device({ accessory: 'temperature', gpio: undefined, script: 'dht22.sh 4' }), 'sensor script')[0].script,
+  'dht22.sh 4',
+  'a measured device keeps its sensor script',
+);
+checks += 5;

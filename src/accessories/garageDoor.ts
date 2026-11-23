@@ -54,7 +54,7 @@ export class GarageDoorAccessory extends CtrlPiAccessory {
       throw new Error(`Garage door '${this.device.name}' has no relay gpio.`);
     }
     const pulseMs = (this.device.duration ?? 2) * 1000;
-    await this.agent.configurePin(this.device.gpio, {
+    await this.configureOwnPin({
       name: this.device.name,
       type: 'output',
       reversed: this.device.reversed ?? false,

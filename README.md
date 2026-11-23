@@ -1,7 +1,7 @@
 # Homebridge ctrlPi
 
 [![Platform: Homebridge](https://img.shields.io/badge/platform-Homebridge%201.8%20%7C%202.0%2B-006400.svg)](#install)
-[![Version 0.9.82](https://img.shields.io/badge/version-0.9.82-blue.svg)](https://github.com/ctrlpi/homebridge-ctrlpi/tags)
+[![Version 0.9.83](https://img.shields.io/badge/version-0.9.83-blue.svg)](https://github.com/ctrlpi/homebridge-ctrlpi/tags)
 [![Auth: Api-Key](https://img.shields.io/badge/auth-Api--Key-orange.svg)](#authentication)
 [![Agents: Pi, Pico & ESP32](https://img.shields.io/badge/agents-Pi%2C%20Pico%20%26%20ESP32-006400.svg)](#install)
 [![License: MIT](https://img.shields.io/badge/license-MIT-188038.svg)](LICENSE)
@@ -128,6 +128,7 @@ An agent is known by its `name` (what it answers on `GET /hello`). Agents are fo
 | `lockedSensor` / `lockedSensorReversed` | `lock` | Input confirming the bolt is thrown. |
 | `zones` | `irrigation` | `[{ name, gpio, duration, reversed }]`, see [Irrigation](#irrigation). |
 | `script` | measured | The script the agent runs for this reading: `"<file> [args...]"`, a bare filename in the agent's `scripts/` folder. Required. |
+| `script` | pin-backed | Optional (agent 0.9.50 or later). A script in the agent's scripts folder to run when the state changes. Use `on:` or `off:` to run only when the state goes on or off, with no prefix it runs on both and gets `1` or `0` as its last argument. |
 | `field` | measured | Only when the script returns several fields: which one to read. |
 | `interval` | measured | How often the agent runs the script, in seconds (default `900`, 15 minutes). `0` reads once at start and never again. |
 

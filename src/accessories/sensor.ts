@@ -100,7 +100,7 @@ export class SensorAccessory extends CtrlPiAccessory {
     if (this.device.gpio === undefined) {
       throw new Error(`'${this.device.name}' is type '${this.device.accessory}' but has no gpio.`);
     }
-    await this.agent.configurePin(this.device.gpio, {
+    await this.configureOwnPin({
       name: this.device.name,
       type: 'input',
       pullup: this.device.pullup ?? 'up',

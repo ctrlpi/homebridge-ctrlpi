@@ -2,7 +2,7 @@ import type { PlatformAccessory, Service } from 'homebridge';
 
 import type { Agent } from '../agent-api.js';
 import type { CtrlPiPlatform } from '../platform.js';
-import { DEVICE_LABEL, GREEN, paint } from '../logging.js';
+import { DEVICE_LABEL, GREEN, RED, paint } from '../logging.js';
 import type { DeviceConfig, WebhookEvent } from '../types.js';
 
 /**
@@ -51,7 +51,7 @@ export abstract class CtrlPiAccessory {
       return await work();
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
-      this.log.error(`${this.tag} ${this.where} - communication failed: ${message}`);
+      this.log.error(`${this.tag} ${this.where} - ${paint(RED, `communication failed: ${message}`)}`);
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
@@ -90,6 +90,17 @@ export abstract class CtrlPiAccessory {
   protected abstract createService(): Service;
   protected getActiveServices(): Service[] {
     return []; 
+  }
+
+  /**
+   * Configure the device's own GPIO. It also carries the device's pin script; a device without one
+   * clears a script the agent still has on that pin. Other pins of the device never get one.
+   */
+  protected configureOwnPin(cfg: Record<string, unknown>): Promise<unknown> {
+    if (this.device.gpio === undefined) {
+      throw new Error(`Device '${this.device.name}' has no gpio.`);
+    }
+    return this.agent.configurePin(this.device.gpio, { ...cfg, script: this.device.script ?? null });
   }
 
   /** Which GPIOs this accessory wants webhook events for. */

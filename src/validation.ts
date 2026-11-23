@@ -26,6 +26,47 @@ const isWhole = (value: unknown, min: number, max: number): value is number =>
 const isSeconds = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value) && value >= 0.001 && value <= MAX_SECONDS;
 
+/**
+ * A pin script is what the agents take on a pin: "[on:|off:]<file> [args]", a bare filename from the
+ * agent's scripts/ folder. `on:` runs it only when the pin goes to 1, `off:` only when it goes to 0
+ * (no value is passed), and with no prefix it runs on both and gets 1 or 0 as its last argument.
+ * A space after the prefix is accepted; the stored form has none.
+ */
+function splitPinScript(script: unknown): { mode: string; parts: string[] } {
+  let text = String(script ?? '').trim();
+  let mode = '';
+  const prefix = /^(on|off)\s*:\s*/i.exec(text);
+  if (prefix) {
+    mode = prefix[1].toLowerCase();
+    text = text.slice(prefix[0].length);
+  }
+  return { mode, parts: text.split(/\s+/).filter(Boolean) };
+}
+
+/** The reason a pin script is not usable, or undefined (an empty one is fine: no script). */
+export function pinScriptError(script: unknown): string | undefined {
+  const { parts } = splitPinScript(script);
+  if (parts.length === 0) {
+    return String(script ?? '').trim() === '' ? undefined : 'script needs a filename after on: or off:';
+  }
+  if (!/^[A-Za-z0-9_][A-Za-z0-9._-]*$/.test(parts[0])) {
+    return 'script must be a bare filename in the agent\'s scripts folder';
+  }
+  if (parts[0].length > 32) {
+    return 'script name is over 32 characters';
+  }
+  if (parts.slice(1).some(arg => !/^[A-Za-z0-9]+$/.test(arg))) {
+    return 'script arguments must be letters and digits only';
+  }
+  return undefined;
+}
+
+/** The form the agents store (no space after the prefix, single spaces), or '' for no script. */
+export function canonicalPinScript(script: unknown): string {
+  const { mode, parts } = splitPinScript(script);
+  return parts.length === 0 ? '' : (mode ? `${mode}:` : '') + parts.join(' ');
+}
+
 /** A pin as a number from a non-negative integer or a digit string, or undefined when it is not one. */
 function toPin(value: unknown): number | undefined {
   if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
@@ -91,6 +132,23 @@ function problem(device: Raw): string | undefined {
   }
   if (device.pullup !== undefined && !['up', 'down', 'none'].includes(device.pullup as string)) {
     return 'pullup must be \'up\', \'down\' or \'none\'';
+  }
+  // On a device with a GPIO, `script` is a pin script for that GPIO (on a measured device it is the
+  // sensor script, checked above). A device with no gpio of its own (irrigation) ignores it.
+  if (!measured && device.script !== undefined) {
+    if (typeof device.script !== 'string' && typeof device.script !== 'number') {
+      return 'script must be text';
+    }
+    const error = pinScriptError(device.script);
+    if (error) {
+      return error;
+    }
+    const canonical = canonicalPinScript(device.script);
+    if (canonical && device.gpio !== undefined) {
+      device.script = canonical;
+    } else {
+      delete device.script;
+    }
   }
   return undefined;
 }

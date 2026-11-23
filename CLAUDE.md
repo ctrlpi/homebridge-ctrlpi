@@ -175,6 +175,8 @@ POSTs a pin that differs, comparing the way the agents store fields (`watched` o
 only when nonzero, `pullup` only on inputs). Never send a field the agents do not know (lock.ts
 used to send `pulse`): it would never match, so that pin would be reconfigured on every start.
 
+- **Pin script** (`script` on a device with a `gpio`; on a measured device `script` stays the sensor script): `validateConfiguration()` checks it and stores the agents' canonical form (`pinScriptError()` / `canonicalPinScript()` in `validation.ts`: `[on:|off:]<file> [args]`, no space after the prefix); a device with no gpio of its own ignores it. `CtrlPiAccessory.configureOwnPin()` (`accessories/base.ts`) pushes it with the device's own `gpio` only, as `script: this.device.script ?? null`; `Agent.configurePin()` turns `null` into `''` when the agent's stored pin still has a script (so a device without one clears it) or drops it, so an agent older than 0.9.50 never gets the field, and `pinMatches()` compares `script` as `(have || '') === (value || '')`. The settings form's one `script` field serves both uses. Tests: `test/validation.mjs` and `test/tests.mjs` (the Porch light).
+
 ## Sensors are configured, not looked up
 
 A `temperature` / `humidity` / `lux` device names a **`script`**, not an existing sensor. The plugin
